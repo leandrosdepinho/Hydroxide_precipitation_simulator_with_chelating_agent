@@ -150,7 +150,7 @@ DATABASE = {
                 "U4+": [25.8],
                 "UO2_2+": [10.2],
                 "V3+": [26.0],
-                "VO2+": [18.8],
+                "VO_2+": [18.8],
                 "Y3+": [18.1],
                 "Yb3+": [19.5],
                 "Zn2+": [16.5],
@@ -213,7 +213,7 @@ DATABASE = {
                 "U4+": [0.0],
                 "UO2_2+": [2.6, 4.4],
                 "V3+": [0.0],
-                "VO2+": [3.2, 6.1],
+                "VO_2+": [3.2, 6.1],
                 "Y3+": [3.5, 6.3, 8.6],
                 "Yb3+": [3.8, 6.8, 9.4],
                 "Zn2+": [5.0, 9.3, 12.1],
@@ -275,7 +275,7 @@ DATABASE = {
                 "U4+": [14.5],
                 "UO2_2+": [6.4, 11.1],
                 "V3+": [7.8],
-                "VO2+": [6.8, 11.8],
+                "VO_2+": [6.8, 11.8],
                 "Y3+": [7.8, 12.8],
                 "Yb3+": [8.4, 13.9],
                 "Zn2+": [5.0, 8.6],
@@ -298,7 +298,7 @@ DATABASE = {
                 "Ta5+": [9.0, 17.5, 24.0],
                 "Ti4+": [8.5, 16.0],
                 "V3+": [6.2, 11.5, 15.5],
-                "VO2+": [6.3, 11.4],
+                "VO_2+": [6.3, 11.4],
                 "Zr4+": [10.0, 19.2, 27.2],
             }
         }
@@ -363,28 +363,24 @@ def calculate_inverse_alpha_Y(ph_value, pkas):
     """
     Calculate 1 / alpha_Y for the fully deprotonated ligand.
 
-    The database stores pKa values in ascending order.
+    The database stores pKa values in ascending order (pKa_1 = first,
+    strongest-acid dissociation ... pKa_n = last, weakest dissociation).
 
     For a ligand Y:
         [Y]_total = [Y] * (1 / alpha_Y)
 
     where [Y] is the concentration of the fully deprotonated form.
+
+    1/alpha_Y = sum_{j=0}^{n} [H+]^(n-j) / (Ka_(j+1) * ... * Ka_n)
+
+    which is computed below by walking the Ka list from the last
+    (weakest) dissociation back to the first.
     """
 
     h = 10.0 ** (-ph_value)
 
     ka_values = [10.0 ** (-pka) for pka in pkas]
 
-    inverse_alpha = 1.0
-    cumulative_product = 1.0
-
-    # Start from the final deprotonation and move backwards.
-    for ka in reversed(ka_values):
-        cumulative_product *= ka
-        inverse_alpha += (h ** (len(ka_values) - len(ka_values) + 1)) / cumulative_product
-
-    # The loop above needs powers 1, 2, 3... in reverse order.
-    # Recalculate explicitly to avoid ambiguity.
     inverse_alpha = 1.0
     cumulative_product = 1.0
 
@@ -398,47 +394,6 @@ def calculate_inverse_alpha_Y(ph_value, pkas):
 # =============================================================================
 # EQUILIBRIUM ENGINE
 # =============================================================================
-
-def calculate_metal_state(
-    metal_name,
-    initial_concentration,
-    free_ligand,
-    ligand_active,
-    ligand_name
-):
-    """
-    Calculate the soluble/precipitated state of one metal at the current pH.
-
-    This function uses the single global complex selected from the database.
-    """
-
-    metal_data = DATABASE["Hydroxide"]["Metals"][metal_name]
-
-    ksp = metal_data["ksp"]
-    hydroxide_stoichiometry = metal_data["y"]
-
-    if ligand_active:
-        beta, coordination_number, _, has_complex = get_complex_parameters(
-            metal_name,
-            ligand_name
-        )
-    else:
-        beta = 0.0
-        coordination_number = 0
-        has_complex = False
-
-    # Free hydroxide concentration:
-    # [OH-] = Kw / [H+] = 10^(pH - 14)
-    #
-    # The actual pH is supplied later by the calling function.
-    return {
-        "ksp": ksp,
-        "hydroxide_stoichiometry": hydroxide_stoichiometry,
-        "beta": beta,
-        "coordination_number": coordination_number,
-        "has_complex": has_complex,
-    }
-
 
 def solve_free_ligand(
     ph,
