@@ -305,7 +305,6 @@ DATABASE = {
         }
     }
 }
-```
 
 }
 
@@ -327,7 +326,6 @@ def get_complex_parameters(metal_name, ligand_name):
 """
 Return the single modeled global complex for a metal-ligand pair.
 
-```
 If several beta values are available, the highest-order complex is used.
 
 Returns
@@ -357,7 +355,6 @@ coordination_number = len(beta_list)
 beta = 10.0 ** log_beta
 
 return beta, coordination_number, log_beta, True
-```
 
 # =============================================================================
 
@@ -369,7 +366,7 @@ def calculate_inverse_alpha_Y(ph_value, pkas):
 """
 Calculate 1 / alpha_Y for the fully deprotonated ligand.
 
-```
+ 
 The database stores pKa values in ascending order (pKa_1 = first,
 strongest-acid dissociation ... pKa_n = last, weakest dissociation).
 
@@ -396,7 +393,7 @@ for i, ka in enumerate(reversed(ka_values), start=1):
     inverse_alpha += (h ** i) / cumulative_product
 
 return inverse_alpha
-```
+ 
 
 # =============================================================================
 
@@ -413,7 +410,7 @@ total_ligand_concentration
 """
 Solve the ligand mass balance by bisection.
 
-```
+ 
 The unknown is the concentration of the fully deprotonated free ligand Y.
 
 Total ligand:
@@ -499,7 +496,7 @@ for _ in range(150):
         high = free_ligand
 
 return 0.5 * (low + high)
-```
+ 
 
 def calculate_precipitation_at_pH(
 ph,
@@ -511,7 +508,7 @@ total_ligand_concentration=0.0
 Calculate precipitation percentage for every selected metal at one pH.
 """
 
-```
+ 
 ligand_active = (
     ligand_name is not None
     and total_ligand_concentration > 0.0
@@ -602,7 +599,7 @@ for metal in metal_systems:
     )
 
 return results
-```
+ 
 
 # =============================================================================
 
@@ -620,7 +617,7 @@ number_of_points=1000
 ):
 """Run the full precipitation-vs-pH simulation."""
 
-```
+ 
 ph_values = np.linspace(
     ph_min,
     ph_max,
@@ -643,7 +640,7 @@ for ph in ph_values:
 df = pd.DataFrame(rows)
 
 return df
-```
+ 
 
 def run_ligand_simulation(
 metal_systems,
@@ -657,7 +654,7 @@ number_of_points=300
 Run precipitation as a function of total ligand concentration
 at a fixed pH.
 
-```
+ 
 The ligand concentration is sampled logarithmically because
 complexation effects can span many orders of magnitude.
 """
@@ -690,7 +687,7 @@ for ligand_concentration in ligand_values:
     rows.append(result)
 
 return pd.DataFrame(rows)
-```
+ 
 
 # =============================================================================
 
@@ -702,7 +699,7 @@ def smooth_series(values):
 """
 Apply a mild Savitzky-Golay filter for visualization.
 
-```
+ 
 This does NOT modify the underlying simulation data.
 """
 
@@ -722,7 +719,7 @@ try:
 
 except Exception:
     return values
-```
+ 
 
 def create_pH_plot(
 df,
@@ -734,7 +731,7 @@ ligand_active
 ):
 """Create precipitation percentage vs pH plot."""
 
-```
+ 
 fig, ax = plt.subplots(figsize=(10, 6))
 
 for metal in selected_metals:
@@ -805,7 +802,7 @@ ax.legend(
 fig.tight_layout()
 
 return fig
-```
+ 
 
 def create_ligand_plot(
 df,
@@ -815,7 +812,7 @@ ligand_name
 ):
 """Create precipitation percentage vs ligand concentration plot."""
 
-```
+ 
 fig, ax = plt.subplots(figsize=(10, 6))
 
 for metal in selected_metals:
@@ -867,7 +864,7 @@ ax.legend(
 fig.tight_layout()
 
 return fig
-```
+ 
 
 # =============================================================================
 
@@ -943,13 +940,13 @@ default=["Al3+", "Fe3+"]
 
 if not selected_metals:
 
-```
+ 
 st.warning(
     "Please select at least one metal."
 )
 
 st.stop()
-```
+ 
 
 # -----------------------------------------------------------------------------
 
@@ -965,7 +962,7 @@ metal_systems = []
 
 for metal_name in selected_metals:
 
-```
+ 
 concentration = st.sidebar.number_input(
     f"{metal_name} concentration (M)",
     min_value=1.0e-12,
@@ -979,7 +976,7 @@ metal_systems.append({
     "name": metal_name,
     "initial_conc": concentration
 })
-```
+ 
 
 # -----------------------------------------------------------------------------
 
@@ -989,7 +986,7 @@ metal_systems.append({
 
 if use_ligand:
 
-```
+ 
 st.sidebar.subheader(
     "Chelating Agent"
 )
@@ -1001,13 +998,13 @@ ligand_concentration = st.sidebar.number_input(
     value=0.20,
     format="%.6g"
 )
-```
+ 
 
 else:
 
-```
+ 
 ligand_concentration = 0.0
-```
+ 
 
 # -----------------------------------------------------------------------------
 
@@ -1037,13 +1034,13 @@ step=0.1
 
 if ph_max <= ph_min:
 
-```
+ 
 st.error(
     "Maximum pH must be greater than minimum pH."
 )
 
 st.stop()
-```
+ 
 
 # -----------------------------------------------------------------------------
 
@@ -1093,7 +1090,7 @@ min(len(selected_metals), 4)
 
 for i, metal_name in enumerate(selected_metals):
 
-```
+ 
 metal_data = DATABASE["Hydroxide"]["Metals"][metal_name]
 
 with info_columns[i % len(info_columns)]:
@@ -1139,7 +1136,7 @@ with info_columns[i % len(info_columns)]:
                 f"No stable modeled {metal_name}-{ligand_name} "
                 "complex in database"
             )
-```
+ 
 
 # =============================================================================
 
@@ -1157,7 +1154,7 @@ use_container_width=True
 
 if run_simulation:
 
-```
+ 
 # -------------------------------------------------------------------------
 # pH simulation
 # -------------------------------------------------------------------------
