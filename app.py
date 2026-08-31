@@ -39,7 +39,6 @@ DATABASE = {
 "pkas": [14.0],
 "charge_anion": 1,
 
-```
     "Metals": {
         "Ag+": {"ksp": 2.0e-8, "x": 1, "y": 1},
         "Al3+": {"ksp": 1.0e-33, "x": 1, "y": 3},
@@ -1264,4 +1263,3 @@ with st.expander(
         df_ph,
         use_container_width=True
     )
-```
