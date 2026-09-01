@@ -1,24 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Competitive Metal Hydroxide Precipitation Simulator
-====================================================
-
-A thermodynamic screening tool for competitive hydroxide precipitation
-in the presence of a chelating agent.
-
-MODEL ASSUMPTIONS
------------------
-1. Ideal solution: activity coefficients = 1.
-2. Thermodynamic constants are treated as applicable at 25 °C.
-3. Only ONE global metal-ligand complex is modeled for each metal-ligand pair.
-4. When multiple beta values are available, the highest-order complex is used.
-5. Metals absent from a ligand's database entry are treated as having
-   no stable complex with that ligand.
-6. Mixed hydroxo-ligand complexes are not included.
-7. The model does not account for redox chemistry, hydrolysis,
-   polymerization, or solid phases other than the supplied hydroxides.
-8. Savitzky-Golay smoothing is used only for visualization.
-"""
 
 import numpy as np
 import pandas as pd
@@ -321,22 +301,6 @@ def get_ligand_pkas(ligand_name):
 
 
 def get_complex_parameters(metal_name, ligand_name):
-    """
-    Return the single modeled global complex for a metal-ligand pair.
-
-    If several beta values are available, the highest-order complex is used.
-
-    Returns
-    -------
-    beta : float
-        Global formation constant for the selected highest-order complex.
-    coordination_number : int
-        Number of ligand molecules in the complex.
-    log_beta : float
-        log10(beta).
-    has_complex : bool
-        Whether a stable modeled complex exists.
-    """
 
     ligand_data = DATABASE["Chelators"][ligand_name]
     beta_list = ligand_data["log_betas"].get(metal_name)
@@ -360,22 +324,6 @@ def get_complex_parameters(metal_name, ligand_name):
 # =============================================================================
 
 def calculate_inverse_alpha_Y(ph_value, pkas):
-    """
-    Calculate 1 / alpha_Y for the fully deprotonated ligand.
-
-    The database stores pKa values in ascending order (pKa_1 = first,
-    strongest-acid dissociation ... pKa_n = last, weakest dissociation).
-
-    For a ligand Y:
-        [Y]_total = [Y] * (1 / alpha_Y)
-
-    where [Y] is the concentration of the fully deprotonated form.
-
-    1/alpha_Y = sum_{j=0}^{n} [H+]^(n-j) / (Ka_(j+1) * ... * Ka_n)
-
-    which is computed below by walking the Ka list from the last
-    (weakest) dissociation back to the first.
-    """
 
     h = 10.0 ** (-ph_value)
 
@@ -401,17 +349,6 @@ def solve_free_ligand(
     ligand_name,
     total_ligand_concentration
 ):
-    """
-    Solve the ligand mass balance by bisection.
-
-    The unknown is the concentration of the fully deprotonated free ligand Y.
-
-    Total ligand:
-        L_total = L_free * (1/alpha_Y)
-                   + sum(N_i * [ML_N])
-
-    where only the highest-order global complex is modeled.
-    """
 
     if total_ligand_concentration <= 0.0:
         return 0.0
@@ -855,7 +792,7 @@ def create_ligand_plot(
 # =============================================================================
 
 st.set_page_config(
-    page_title="Metal Hydroxide Precipitation Simulator",
+    page_title="Hydroxide precipitation simulator with chelating agent",
     page_icon="🧪",
     layout="wide"
 )
