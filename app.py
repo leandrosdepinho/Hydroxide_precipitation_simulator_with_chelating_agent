@@ -803,7 +803,7 @@ st.set_page_config(
 # -----------------------------------------------------------------------------
 
 st.title(
-    "🧪 Competitive Metal Hydroxide Precipitation Simulator"
+    "🧪 Hydroxide precipitation simulator with chelating agent"
 )
 
 st.markdown(
